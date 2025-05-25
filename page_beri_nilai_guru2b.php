@@ -1,0 +1,596 @@
+<?php
+include "koneksi.php";
+session_start();
+$tahun_ini = date("Y");
+?>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page Guru</title>
+    <style>
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            background: url('bgnusput.jpg') no-repeat center center fixed;
+            background-size: 100% 100%;
+            /* Mengatur ukuran latar belakang sesuai halaman */
+            background-position: center center;
+            font-family: Arial, sans-serif;
+        }
+
+        .navbar-pendidikan {
+            background-color: #3498db;
+            /* Ubah warna background ke warna sebelumnya */
+            border: 1px solid #2978a0;
+            padding: 10px 0;
+            text-align: center;
+            /* Posisi teks navbar di tengah */
+        }
+
+        .navbar-pendidikan a {
+            display: inline-block;
+            color: white;
+            padding: 14px 10px;
+            text-decoration: none;
+            margin: 0 10px;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        .navbar-pendidikan a:hover {
+            background-color: #265C70;
+        }
+
+        .container {
+            background-color: #fff;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table,
+        th,
+        td {
+            border: 1px solid #ccc;
+        }
+
+        th,
+        td {
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #3498db;
+            color: #fff;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+    </style>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+</head>
+
+<body>
+    <div class="navbar-pendidikan" id="navbar-guru">
+        <a href="page_pendidikan.php">Home</a>
+        <a href="page_profil_pendidikan.php">Profil</a>
+        <a href="page_beri_nilai_pendidikan.php">Nilai Berkas</a>
+        <a href="page_laporan_kinerja_guru_pendidikan.php">Laporan Kinerja Guru</a>
+        <a href="page_jenjang_pendidikan.php">Nilai Jenjang</a>
+        <a href="page_nilaisemua_pendidikan.php">Cek Nilai</a>
+        <a href="logout.php">Logout</a>
+    </div>
+
+    <div class="container">
+        <h2>B. Kegiatan Eksternal</h2>
+        <h3>• 2. Pembimbing Tampilan/Event</h3>
+        <table>
+            <tr>
+                <th>No</th>
+                <th>Nama</th>
+                <th>Romawi</th>
+                <th>Dibuktikan dengan surat tugas dari pimpinan jenjang:</th>
+                <th>Laporan kegiatan:</th>
+                <th>Skor Sistem</th>
+                <th>Skor Fix</th>
+            </tr>
+
+            <?php
+            $no = 1;
+            $query_ia = mysqli_query($koneksi, "SELECT * FROM tabel_p_pendidikan2 WHERE tahun_penilaian = '$tahun_ini'");
+
+            while ($row = mysqli_fetch_array($query_ia)) {
+                $file_berkasiaa = $row['berkasiib2'];
+                $file_berkasiaaa = $row['berkasiib22'];
+            ?>
+                <tr>
+                    <td><?php echo $no++; ?></td>
+                    <td><?php echo $row['nama']; ?></td>
+                    <td><?php echo $row['iib2']; ?></td>
+                    <td>
+                        <?php if (!empty($file_berkasiaa)) { ?>
+                            <a href="uploads/<?php echo $file_berkasiaa; ?>" target="_blank">Download</a>
+                        <?php } else {
+                            echo "Tidak ada file";
+                        } ?>
+                    </td>
+                    <td>
+                        <?php if (!empty($file_berkasiaaa)) { ?>
+                            <a href="uploads/<?php echo $file_berkasiaaa; ?>" target="_blank">Download</a>
+                        <?php } else {
+                            echo "Tidak ada file";
+                        } ?>
+                    </td>
+                    <td><?php echo $row['poiniib2']; ?></td>
+                    <td>
+                        <input type="text" class="editable-iib2" data-id="<?php echo $row['id']; ?>" value="<?php echo $row['apoiniib2']; ?>">
+                    </td>
+                </tr>
+            <?php } ?>
+        </table>
+        <script>
+            $(document).ready(function() {
+                $(".editable-iib2").on("change", function() {
+                    var skorFix = $(this).val();
+                    var id = $(this).data("id");
+
+                    $.ajax({
+                        url: "update_skoriib2.php",
+                        type: "POST",
+                        data: {
+                            id: id,
+                            skor_fix: skorFix
+                        },
+                        success: function(response) {
+                            console.log("Skor Fix berhasil diperbarui");
+                        },
+                        error: function(xhr, status, error) {
+                            console.error("Terjadi kesalahan: " + error);
+                        }
+                    });
+                });
+            });
+        </script>
+
+
+
+        <h3>• 3.Pembimbing Lomba</h3>
+        <h3>• Pembimbing Peserta Lomba</h3>
+        <table>
+            <tr>
+                <th>No</th>
+                <th>Nama</th>
+                <th>Romawi</th>
+                <th>Surat tugas dari Pimpinan jenjang :</th>
+                <th>Flyer atau Undangan:</th>
+                <th>Jurnal Pembimbingan:</th>
+                <th>Skor Sistem</th>
+                <th>Skor Fix</th>
+            </tr>
+
+            <?php
+            $no = 1;
+            $query_ia = mysqli_query($koneksi, "SELECT * FROM tabel_p_pendidikan2 WHERE tahun_penilaian = '$tahun_ini'");
+
+            while ($row = mysqli_fetch_array($query_ia)) {
+                $file_berkasiaa = $row['berkasiib3'];
+                $file_berkasiaaa = $row['berkasiib33'];
+                $file_berkasiaaaa = $row['berkasiib333'];
+            ?>
+                <tr>
+                    <td><?php echo $no++; ?></td>
+                    <td><?php echo $row['nama']; ?></td>
+                    <td><?php echo $row['iib3']; ?></td>
+                    <td>
+                        <?php if (!empty($file_berkasiaa)) { ?>
+                            <a href="uploads/<?php echo $file_berkasiaa; ?>" target="_blank">Download</a>
+                        <?php } else {
+                            echo "Tidak ada file";
+                        } ?>
+                    </td>
+                    <td>
+                        <?php if (!empty($file_berkasiaaa)) { ?>
+                            <a href="uploads/<?php echo $file_berkasiaaa; ?>" target="_blank">Download</a>
+                        <?php } else {
+                            echo "Tidak ada file";
+                        } ?>
+                    </td>
+                    <td>
+                        <?php if (!empty($file_berkasiaaaa)) { ?>
+                            <a href="uploads/<?php echo $file_berkasiaaaa; ?>" target="_blank">Download</a>
+                        <?php } else {
+                            echo "Tidak ada file";
+                        } ?>
+                    </td>
+                    <td><?php echo $row['poiniib3']; ?></td>
+                    <td>
+                        <input type="text" class="editable-iib3" data-id="<?php echo $row['id']; ?>" value="<?php echo $row['apoiniib3']; ?>">
+                    </td>
+                </tr>
+            <?php } ?>
+        </table>
+        <script>
+            $(document).ready(function() {
+                $(".editable-iib3").on("change", function() {
+                    var skorFix = $(this).val();
+                    var id = $(this).data("id");
+
+                    $.ajax({
+                        url: "update_skoriib3.php",
+                        type: "POST",
+                        data: {
+                            id: id,
+                            skor_fix: skorFix
+                        },
+                        success: function(response) {
+                            console.log("Skor Fix berhasil diperbarui");
+                        },
+                        error: function(xhr, status, error) {
+                            console.error("Terjadi kesalahan: " + error);
+                        }
+                    });
+                });
+            });
+        </script>
+
+
+
+
+
+        <h3>• Pembimbing Pemenang Lomba</h3>
+        <table>
+            <tr>
+                <th>No</th>
+                <th>Nama</th>
+                <th>Romawi</th>
+                <th>Surat tugas dari Pimpinan jenjang : </th>
+                <th>Flyer atau Undangan:</th>
+                <th>Jurnal Pembimbingan:</th>
+                <th>Piagam/Sertifikat Kejuaraan:</th>
+                <th>Skor Sistem</th>
+                <th>Skor Fix</th>
+            </tr>
+
+            <?php
+            $no = 1;
+            $query_ia = mysqli_query($koneksi, "SELECT * FROM tabel_p_pendidikan2 WHERE tahun_penilaian = '$tahun_ini'");
+
+            while ($row = mysqli_fetch_array($query_ia)) {
+                $file_berkasiaa = $row['berkasiiba3'];
+                $file_berkasiaaa = $row['berkasiiba33'];
+                $file_berkasiaaaa = $row['berkasiiba333'];
+                $file_berkasiaaaaa = $row['berkasiiba3333'];
+            ?>
+                <tr>
+                    <td><?php echo $no++; ?></td>
+                    <td><?php echo $row['nama']; ?></td>
+                    <td><?php echo $row['iiba3']; ?></td>
+                    <td>
+                        <?php if (!empty($file_berkasiaa)) { ?>
+                            <a href="uploads/<?php echo $file_berkasiaa; ?>" target="_blank">Download</a>
+                        <?php } else {
+                            echo "Tidak ada file";
+                        } ?>
+                    </td>
+                    <td>
+                        <?php if (!empty($file_berkasiaaa)) { ?>
+                            <a href="uploads/<?php echo $file_berkasiaaa; ?>" target="_blank">Download</a>
+                        <?php } else {
+                            echo "Tidak ada file";
+                        } ?>
+                    </td>
+                    <td>
+                        <?php if (!empty($file_berkasiaaaa)) { ?>
+                            <a href="uploads/<?php echo $file_berkasiaaaa; ?>" target="_blank">Download</a>
+                        <?php } else {
+                            echo "Tidak ada file";
+                        } ?>
+                    </td>
+                    <td>
+                        <?php if (!empty($file_berkasiaaaaa)) { ?>
+                            <a href="uploads/<?php echo $file_berkasiaaaaa; ?>" target="_blank">Download</a>
+                        <?php } else {
+                            echo "Tidak ada file";
+                        } ?>
+                    </td>
+                    <td><?php echo $row['poiniiba3']; ?></td>
+                    <td>
+                        <input type="text" class="editable-iiba3" data-id="<?php echo $row['id']; ?>" value="<?php echo $row['apoiniiba3']; ?>">
+                    </td>
+                </tr>
+            <?php } ?>
+        </table>
+        <script>
+            $(document).ready(function() {
+                $(".editable-iiba3").on("change", function() {
+                    var skorFix = $(this).val();
+                    var id = $(this).data("id");
+
+                    $.ajax({
+                        url: "update_skoriiba3.php",
+                        type: "POST",
+                        data: {
+                            id: id,
+                            skor_fix: skorFix
+                        },
+                        success: function(response) {
+                            console.log("Skor Fix berhasil diperbarui");
+                        },
+                        error: function(xhr, status, error) {
+                            console.error("Terjadi kesalahan: " + error);
+                        }
+                    });
+                });
+            });
+        </script>
+
+
+
+
+
+<h3>4.Pendampingan</h3>
+<h3>• Pendamping outingclass / prakerin/ fieldtrip</h3>
+        <table>
+            <tr>
+                <th>No</th>
+                <th>Nama</th>
+                <th>Romawi</th>
+                <th>Surat tugas dari Pimpinan Jenjang :</th>
+                <th>Foto kegiatan sesuai dengan kegiatan yang didampingi:</th>
+                <th>Skor Sistem</th>
+                <th>Skor Fix</th>
+            </tr>
+
+            <?php
+            $no = 1;
+            $query_ia = mysqli_query($koneksi, "SELECT * FROM tabel_p_pendidikan2 WHERE tahun_penilaian = '$tahun_ini'");
+
+            while ($row = mysqli_fetch_array($query_ia)) {
+                $file_berkasiaa = $row['berkasiib4'];
+                $file_berkasiaaa = $row['berkasiib44'];
+               
+
+            ?>
+                <tr>
+                    <td><?php echo $no++; ?></td>
+                    <td><?php echo $row['nama']; ?></td>
+                    <td><?php echo $row['iib4']; ?></td>
+                    <td>
+                        <?php if (!empty($file_berkasiaa)) { ?>
+                            <a href="uploads/<?php echo $file_berkasiaa; ?>" target="_blank">Download</a>
+                        <?php } else {
+                            echo "Tidak ada file";
+                        } ?>
+                    </td>
+                    <td>
+                        <?php if (!empty($file_berkasiaaa)) { ?>
+                            <a href="uploads/<?php echo $file_berkasiaaa; ?>" target="_blank">Download</a>
+                        <?php } else {
+                            echo "Tidak ada file";
+                        } ?>
+                    </td>
+                    
+                    
+                    <td><?php echo $row['poiniiba3']; ?></td>
+                    <td>
+                        <input type="text" class="editable-iib4" data-id="<?php echo $row['id']; ?>" value="<?php echo $row['apoiniib4']; ?>">
+                    </td>
+                </tr>
+            <?php } ?>
+        </table>
+        <script>
+            $(document).ready(function() {
+                $(".editable-iib4").on("change", function() {
+                    var skorFix = $(this).val();
+                    var id = $(this).data("id");
+
+                    $.ajax({
+                        url: "update_skoriib4.php",
+                        type: "POST",
+                        data: {
+                            id: id,
+                            skor_fix: skorFix
+                        },
+                        success: function(response) {
+                            console.log("Skor Fix berhasil diperbarui");
+                        },
+                        error: function(xhr, status, error) {
+                            console.error("Terjadi kesalahan: " + error);
+                        }
+                    });
+                });
+            });
+        </script>
+
+
+
+
+<h3>• Pendamping tampilan/event/pameran PPD/lomba eksternal</h3>
+        <table>
+            <tr>
+                <th>No</th>
+                <th>Nama</th>
+                <th>Romawi</th>
+                <th>Surat tugas dari Pimpinan Jenjang :</th>
+                <th>Foto kegiatan sesuai dengan kegiatan yang didampingi:</th>
+                <th>Skor Sistem</th>
+                <th>Skor Fix</th>
+            </tr>
+
+            <?php
+            $no = 1;
+            $query_ia = mysqli_query($koneksi, "SELECT * FROM tabel_p_pendidikan2 WHERE tahun_penilaian = '$tahun_ini'");
+
+            while ($row = mysqli_fetch_array($query_ia)) {
+                $file_berkasiaa = $row['berkasiibb4'];
+                $file_berkasiaaa = $row['berkasiibb44'];
+               
+
+            ?>
+                <tr>
+                    <td><?php echo $no++; ?></td>
+                    <td><?php echo $row['nama']; ?></td>
+                    <td><?php echo $row['iibb4']; ?></td>
+                    <td>
+                        <?php if (!empty($file_berkasiaa)) { ?>
+                            <a href="uploads/<?php echo $file_berkasiaa; ?>" target="_blank">Download</a>
+                        <?php } else {
+                            echo "Tidak ada file";
+                        } ?>
+                    </td>
+                    <td>
+                        <?php if (!empty($file_berkasiaaa)) { ?>
+                            <a href="uploads/<?php echo $file_berkasiaaa; ?>" target="_blank">Download</a>
+                        <?php } else {
+                            echo "Tidak ada file";
+                        } ?>
+                    </td>
+                    
+                    
+                    <td><?php echo $row['poiniibb4']; ?></td>
+                    <td>
+                        <input type="text" class="editable-iibb4" data-id="<?php echo $row['id']; ?>" value="<?php echo $row['apoiniibb4']; ?>">
+                    </td>
+                </tr>
+            <?php } ?>
+        </table>
+        <script>
+            $(document).ready(function() {
+                $(".editable-iibb4").on("change", function() {
+                    var skorFix = $(this).val();
+                    var id = $(this).data("id");
+
+                    $.ajax({
+                        url: "update_skoriibb4.php",
+                        type: "POST",
+                        data: {
+                            id: id,
+                            skor_fix: skorFix
+                        },
+                        success: function(response) {
+                            console.log("Skor Fix berhasil diperbarui");
+                        },
+                        error: function(xhr, status, error) {
+                            console.error("Terjadi kesalahan: " + error);
+                        }
+                    });
+                });
+            });
+        </script>
+
+
+
+
+
+
+
+
+<h3>• Pendamping home visit</h3>
+        <table>
+            <tr>
+                <th>No</th>
+                <th>Nama</th>
+                <th>Romawi</th>
+                <th>Surat tugas dari Pimpinan Jenjang :</th>
+                <th>Foto kegiatan sesuai dengan kegiatan yang didampingi:</th>
+                <th>Dibuktikan dengan screenshoot dari postingan IG pribadi guru (nama akun sesuai nama guru) ( dipilih salah satu kegiatan sesuai kegiatan yang dilaksanakan )</th>
+                <th>Skor Sistem</th>
+                <th>Skor Fix</th>
+            </tr>
+
+            <?php
+            $no = 1;
+            $query_ia = mysqli_query($koneksi, "SELECT * FROM tabel_p_pendidikan2 WHERE tahun_penilaian = '$tahun_ini'");
+
+            while ($row = mysqli_fetch_array($query_ia)) {
+                $file_berkasiaa = $row['berkasiibc4'];
+                $file_berkasiaaa = $row['berkasiibc44'];
+                $file_berkasiaaaa = $row['berkasiib1'];
+
+            ?>
+                <tr>
+                    <td><?php echo $no++; ?></td>
+                    <td><?php echo $row['nama']; ?></td>
+                    <td><?php echo $row['iibc4']; ?></td>
+                    <td>
+                        <?php if (!empty($file_berkasiaa)) { ?>
+                            <a href="uploads/<?php echo $file_berkasiaa; ?>" target="_blank">Download</a>
+                        <?php } else {
+                            echo "Tidak ada file";
+                        } ?>
+                    </td>
+                    <td>
+                        <?php if (!empty($file_berkasiaaa)) { ?>
+                            <a href="uploads/<?php echo $file_berkasiaaa; ?>" target="_blank">Download</a>
+                        <?php } else {
+                            echo "Tidak ada file";
+                        } ?>
+                    </td>
+                    <td>
+                        <?php if (!empty($file_berkasiaaaa)) { ?>
+                            <a href="uploads/<?php echo $file_berkasiaaaa; ?>" target="_blank">Download</a>
+                        <?php } else {
+                            echo "Tidak ada file";
+                        } ?>
+                    </td>
+                    
+                    <td><?php echo $row['poiniibc4']; ?></td>
+                    <td>
+                        <input type="text" class="editable-iibc4" data-id="<?php echo $row['id']; ?>" value="<?php echo $row['apoiniibc4']; ?>">
+                    </td>
+                </tr>
+            <?php } ?>
+        </table>
+        <script>
+            $(document).ready(function() {
+                $(".editable-iibc4").on("change", function() {
+                    var skorFix = $(this).val();
+                    var id = $(this).data("id");
+
+                    $.ajax({
+                        url: "update_skoriibc4.php",
+                        type: "POST",
+                        data: {
+                            id: id,
+                            skor_fix: skorFix
+                        },
+                        success: function(response) {
+                            console.log("Skor Fix berhasil diperbarui");
+                        },
+                        error: function(xhr, status, error) {
+                            console.error("Terjadi kesalahan: " + error);
+                        }
+                    });
+                });
+            });
+        </script>
+
+
+    </div>
+
+
+
+
+
+
+
+
+
+</body>
+
+</html>
